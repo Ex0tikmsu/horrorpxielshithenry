@@ -3,20 +3,32 @@ using UnityEngine.InputSystem;
 
 public class MovementPlayer : MonoBehaviour
 {
-    private float moveSpeed = 5f;
+    [SerializeField] private float moveSpeed = 5f;
     private Rigidbody2D rb;
     private Vector2 moveInput;
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    // Update is called once per frame
+    [System.Obsolete]
     void Update()
     {
-        rb.linearVelocity = moveInput * moveSpeed;
+        rb.velocity = moveInput * moveSpeed;
+
+        // Flip sprite
+        if (moveInput.x != 0)
+            spriteRenderer.flipX = moveInput.x < 0;
+
+        // Set animator parameters
+        animator.SetBool("isWalking", moveInput != Vector2.zero);
+        animator.SetFloat("moveX", moveInput.x);
+        animator.SetFloat("moveY", moveInput.y);
     }
 
     public void Move(InputAction.CallbackContext context)
